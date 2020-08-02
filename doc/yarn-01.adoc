@@ -1,0 +1,26 @@
+== YARN
+
+This contains documentation about YARN used in this project.
+
+https://yarnpkg.com/getting-started/install[Upgrading to YARN 2, window=_blank]
+
+This command will set the local version to yarn 2/berry
+[source, shell]
+----
+yarn --version
+yarn policies set-version berry
+yarn set version berry
+----
+
+YARN command to list all executable installed
+[source, shell]
+----
+yarn bin
+----
+
+YARN command to execute executable commands
+[source, shell]
+----
+yarn run asciidoctor .\doc\project.adoc # <1>
+----
+<1> Here we are executing command asciidoctor with parameter .\doc\project.adoc

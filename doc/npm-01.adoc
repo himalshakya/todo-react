@@ -1,0 +1,4 @@
+== NPM Package Manager
+
+This contains documentation about the NPM Package Manager used in this project.
+
