@@ -23,4 +23,11 @@ YARN command to execute executable commands
 ----
 yarn run asciidoctor .\doc\project.adoc # <1>
 ----
-<1> Here we are executing command asciidoctor with parameter .\doc\project.adoc
+<1> Here we are executing command asciidoctor with parameter .\doc\project.
+
+YARN command to downgrade to classic 1.x
+[source, shell]
+----
+yarn set version classic
+----
+_yarn (berry) seems to have some problem with Webpack, and we have decided to downgrade_

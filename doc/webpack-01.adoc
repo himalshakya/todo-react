@@ -1,0 +1,122 @@
+== Webpack
+
+Installing webpack
+[source, shell]
+----
+yarn add -D webpack webpack-cli webpack-dev-server
+----
+
+Installing https://v5.getbootstrap.com/[Bootstrap v5,window=_blank]
+[source, shell]
+----
+yarn add bootstrap@next popper.js
+----
+
+Installing other webpack plugins and loaders
+[source, shell]
+----
+yarn add -D clean-webpack-plugin css-loader file-loader html-loader html-webpack-plugin mini-css-extract-plugin optimize-css-assets-webpack-plugin sass sass-loader style-loader webpack-merge
+----
+
+Setting up *webpack.common.js*
+[source, javascript]
+----
+module.exports = {
+  entry: {
+    main: "./src/index.js",
+  },
+  module: {
+    rules: [
+      {
+        test: /\.html$/i,
+        loader: "html-loader",
+      },
+      {
+        test: /\.(svg|png|jpe?g|gif)$/i,
+        use: {
+          loader: "file-loader",
+          options: {
+            name: "[name].[hash].[ext]",
+            outputPath: "assets",
+          },
+        },
+      },
+    ],
+  },
+};
+----
+
+Setting up *webpack.dev.js*
+[source, javascript]
+----
+const path = require("path");
+const { merge } = require("webpack-merge");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const common = require("./webpack.common.js");
+
+module.exports = merge(common, {
+  mode: "development",
+  devtool: "inline-source-map",
+  output: {
+    filename: "[name].bundle.js",
+    path: path.resolve(__dirname, "dist"),
+  },
+  module: {
+    rules: [
+      {
+        test: /\.scss$/i,
+        use: ["style-loader", "css-loader", "sass-loader"],
+      },
+    ],
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: "./src/template.html",
+    }),
+  ],
+});
+----
+
+Setting up *webpack.prod.js*
+[source, javascript]
+----
+const path = require("path");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const { merge } = require("webpack-merge");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const common = require("./webpack.common.js");
+
+module.exports = merge(common, {
+  mode: "production",
+  output: {
+    filename: "[name].[contentHash].bundle.js",
+    path: path.resolve(__dirname, "dist"),
+  },
+  optimization: {
+    minimizer: [new OptimizeCssAssetsPlugin(), new TerserPlugin()],
+  },
+  plugins: [
+    new CleanWebpackPlugin(),
+    new MiniCssExtractPlugin(),
+    new HtmlWebpackPlugin({
+      template: "./src/template.html",
+      minify: {
+        removeComments: true,
+        removeAttributeQuotes: true,
+        collapseWhitespace: true,
+      },
+    }),
+  ],
+  module: {
+    rules: [
+      {
+        test: /\.scss$/i,
+        use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
+      },
+    ],
+  },
+});
+----
