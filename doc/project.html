@@ -483,6 +483,22 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="paragraph">
 <p>This contains documentation about ASCII Doc used in this project.</p>
 </div>
+<div class="paragraph">
+<p>Installing AsciiDoctor</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="shell" class="language-shell hljs">yarn add -D asciidoctor @asciidoctor/core asciidoctor-pdf</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Executing AsciiDoctor</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="shell" class="language-shell hljs">yarn run asciidoctor .\doc\project.adoc</code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -523,16 +539,161 @@ yarn set version berry</code></pre>
 <div class="colist arabic">
 <ol>
 <li>
-<p>Here we are executing command asciidoctor with parameter .\doc\project.adoc</p>
+<p>Here we are executing command asciidoctor with parameter .\doc\project.</p>
 </li>
 </ol>
+</div>
+<div class="paragraph">
+<p>YARN command to downgrade to classic 1.x</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="shell" class="language-shell hljs">yarn set version classic</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><em>yarn (berry) seems to have some problem with Webpack, and we have decided to downgrade</em>
+== Webpack</p>
+</div>
+<div class="paragraph">
+<p>Installing webpack</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="shell" class="language-shell hljs">yarn add -D webpack webpack-cli webpack-dev-server</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Installing <a href="https://v5.getbootstrap.com/" target="_blank" rel="noopener">Bootstrap v5</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="shell" class="language-shell hljs">yarn add bootstrap@next popper.js</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Installing other webpack plugins and loaders</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="shell" class="language-shell hljs">yarn add -D clean-webpack-plugin css-loader file-loader html-loader html-webpack-plugin mini-css-extract-plugin optimize-css-assets-webpack-plugin sass sass-loader style-loader webpack-merge</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Setting up <strong>webpack.common.js</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="javascript" class="language-javascript hljs">module.exports = {
+  entry: {
+    main: "./src/index.js",
+  },
+  module: {
+    rules: [
+      {
+        test: /\.html$/i,
+        loader: "html-loader",
+      },
+      {
+        test: /\.(svg|png|jpe?g|gif)$/i,
+        use: {
+          loader: "file-loader",
+          options: {
+            name: "[name].[hash].[ext]",
+            outputPath: "assets",
+          },
+        },
+      },
+    ],
+  },
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Setting up <strong>webpack.dev.js</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="javascript" class="language-javascript hljs">const path = require("path");
+const { merge } = require("webpack-merge");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const common = require("./webpack.common.js");
+
+module.exports = merge(common, {
+  mode: "development",
+  devtool: "inline-source-map",
+  output: {
+    filename: "[name].bundle.js",
+    path: path.resolve(__dirname, "dist"),
+  },
+  module: {
+    rules: [
+      {
+        test: /\.scss$/i,
+        use: ["style-loader", "css-loader", "sass-loader"],
+      },
+    ],
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: "./src/template.html",
+    }),
+  ],
+});</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Setting up <strong>webpack.prod.js</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="javascript" class="language-javascript hljs">const path = require("path");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const { merge } = require("webpack-merge");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const common = require("./webpack.common.js");
+
+module.exports = merge(common, {
+  mode: "production",
+  output: {
+    filename: "[name].[contentHash].bundle.js",
+    path: path.resolve(__dirname, "dist"),
+  },
+  optimization: {
+    minimizer: [new OptimizeCssAssetsPlugin(), new TerserPlugin()],
+  },
+  plugins: [
+    new CleanWebpackPlugin(),
+    new MiniCssExtractPlugin(),
+    new HtmlWebpackPlugin({
+      template: "./src/template.html",
+      minify: {
+        removeComments: true,
+        removeAttributeQuotes: true,
+        collapseWhitespace: true,
+      },
+    }),
+  ],
+  module: {
+    rules: [
+      {
+        test: /\.scss$/i,
+        use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
+      },
+    ],
+  },
+});</code></pre>
+</div>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-08-02 01:12:03 -0400
+Last updated 2020-08-02 14:51:08 -0400
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">

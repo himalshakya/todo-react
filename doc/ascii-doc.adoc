@@ -2,3 +2,17 @@
 
 This contains documentation about ASCII Doc used in this project.
 
+Installing AsciiDoctor
+
+[source, shell]
+----
+yarn add -D asciidoctor @asciidoctor/core asciidoctor-pdf
+----
+
+Executing AsciiDoctor
+
+[source, shell]
+----
+yarn run asciidoctor .\doc\project.adoc
+----
+
